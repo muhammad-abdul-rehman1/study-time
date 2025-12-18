@@ -3,41 +3,37 @@
 {% load account socialaccount %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <h1 class="auth-title">{% trans "Sign Up" %}</h1>
+<div class="auth-container"
+    style="max-width: 400px; margin: 0 auto; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="text-align: center; margin-bottom: 2rem;">{% trans "Sign Up" %}</h1>
 
-        <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">
-            {% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans
-            %}
-        </p>
+    <p style="text-align: center; margin-bottom: 2rem;">
+        {% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}
+    </p>
 
-        <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-            {% csrf_token %}
+    <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
 
-            {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                <small class="form-text text-muted"
-                    style="display: block; color: var(--text-secondary); font-size: 0.85em; margin-top: 4px;">
-                    {{ field.help_text }}
-                </small>
-                {% endif %}
-                {% for error in field.errors %}
-                <div style="color: var(--accent-color); font-size: 0.9em; margin-top: 0.25rem;">{{ error }}</div>
-                {% endfor %}
-            </div>
-            {% endfor %}
-
-            {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small class="form-text text-muted"
+                style="display: block; color: #666; font-size: 0.85em; margin-top: 4px;">{{ field.help_text }}</small>
             {% endif %}
+            {% for error in field.errors %}
+            <div class="alert alert-danger" style="color: red; font-size: 0.9em;">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
 
-            <button class="primaryAction btn btn-primary btn-block" type="submit" style="margin-top: 1.5rem;">{% trans
-                "Sign Up" %}</button>
-        </form>
-    </div>
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+
+        <button class="primaryAction" type="submit" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+    </form>
+</div>
 </div>
 {% endblock %}
