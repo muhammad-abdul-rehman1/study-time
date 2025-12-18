@@ -15,6 +15,8 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.railway.app']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https' # Uncomment if needed
 
 INSTALLED_APPS = [
     'django.contrib.admin',
