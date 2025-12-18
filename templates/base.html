@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Time</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <nav>
+        <div>
+            <a href="{% url 'dashboard' %}"
+                style="font-weight: bold; text-decoration: none; font-size: 1.2rem; margin-right: 20px;">Study Time</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" style="margin-right: 15px;">Dashboard</a>
+            <a href="{% url 'leaderboard' %}" style="margin-right: 15px;">Leaderboard</a>
+            <a href="{% url 'history' %}" style="margin-right: 15px;">History</a>
+            {% endif %}
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+            <span style="margin-right: 10px;">{{ user.username }}</span>
+            <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+            {% else %}
+            <a href="{% url 'account_login' %}">Login</a>
+            <span style="margin: 0 5px;">|</span>
+            <a href="{% url 'account_signup' %}">Signup</a>
+            {% endif %}
+        </div>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const timeElements = document.querySelectorAll('.local-time');
+            timeElements.forEach(el => {
+                const utcStr = el.getAttribute('data-iso');
+                if (utcStr) {
+                    const date = new Date(utcStr);
+                    // Format: HH:MM (Local)
+                    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                    el.textContent = timeString;
+                }
+            });
+
+            const dateElements = document.querySelectorAll('.local-date');
+            dateElements.forEach(el => {
+                const utcStr = el.getAttribute('data-iso');
+                if (utcStr) {
+                    const date = new Date(utcStr);
+                    el.textContent = date.toLocaleDateString();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

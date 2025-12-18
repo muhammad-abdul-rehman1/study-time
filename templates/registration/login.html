@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block content %}
+<h2>Login</h2>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{% provider_login_url 'google' %}"
+        style="display: inline-block; background-color: #db4437; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+        Login with Google
+    </a>
+    <p style="margin-top: 1rem; color: #666;">Standard login is disabled.</p>
+</div>
+{% endblock %}

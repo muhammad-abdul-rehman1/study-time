@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Study History</h2>
+<div style="margin-top: 2rem;">
+    {% for date, stats in history.items %}
+    <div style="border: 1px solid #eee; border-radius: 8px; margin-bottom: 1rem; padding: 1rem;">
+        <h3 style="margin-top: 0; border-bottom: 1px solid #f9f9f9; padding-bottom: 0.5rem;"><span class="local-date"
+                data-iso="{{ date|date:'c' }}">{{ date }}</span></h3>
+        <p>Total Time: <strong>{{ stats.hours }}h {{ stats.minutes }}m</strong></p>
+        <ul style="color: #666; font-size: 0.9rem;">
+            {% for session in stats.sessions %}
+            <li>
+                <span class="local-time" data-iso="{{ session.start_time|date:'c' }}"></span> -
+                {% if session.end_time %}
+                <span class="local-time" data-iso="{{ session.end_time|date:'c' }}"></span>
+                {% else %}
+                Now
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% empty %}
+    <p>No history yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

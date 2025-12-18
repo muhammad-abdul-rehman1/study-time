@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Welcome back, {{ user.username }}!</p>
+
+<div
+    style="margin-top: 2rem; padding: 2rem; border: 1px solid #eee; border-radius: 8px; text-align: center; background-color: #f9f9f9;">
+    <h3>Today's Study Time: {{ total_hours }}h {{ total_minutes }}m</h3>
+
+    {% if is_studying %}
+    <div style="margin: 20px 0;">
+        <p style="font-size: 1.2rem; color: #ff9800;">Currently Studying...</p>
+        <p>Started at: <span class="local-time" data-iso="{{ active_session.start_time|date:'c' }}">Loading...</span>
+        </p>
+    </div>
+    <form action="{% url 'stop_study' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #f44336;">Stop Studying</button>
+    </form>
+    {% else %}
+    <div style="margin: 20px 0;">
+        <p style="color: #666;">Ready to focus?</p>
+    </div>
+    <form action="{% url 'start_study' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #4CAF50;">Start Studying</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
