@@ -19,16 +19,14 @@
             <ul class="socialaccount_providers" style="list-style: none; padding: 0;">
                 {% include "socialaccount/snippets/provider_list.html" with process="login" %}
             </ul>
-            <div class="login-or" style="text-align: center; margin: 1.5rem 0; color: var(--text-secondary);">{% trans
-                'or' %}</div>
+            <div class="login-or" style="text-align: center; margin: 1.5rem 0; color: var(--text-secondary);">or</div>
         </div>
 
         {% include "socialaccount/snippets/login_extra.html" %}
 
         {% else %}
-        <p style="text-align: center; margin-bottom: 1.5rem;">{% blocktrans %}If you have not created an account yet,
-            then please
-            <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}
+        <p style="text-align: center; margin-bottom: 1.5rem;">
+            Already have an account? <a href="{% url 'account_signup' %}">Sign up</a> here.
         </p>
         {% endif %}
 
@@ -39,10 +37,6 @@
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.help_text %}
-                <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">{{ field.help_text
-                    }}</small>
-                {% endif %}
                 {% for error in field.errors %}
                 <div style="color: var(--accent-color); font-size: 0.9em; margin-top: 0.25rem;">{{ error }}</div>
                 {% endfor %}
@@ -54,10 +48,10 @@
             {% endif %}
 
             <div class="form-actions">
-                <button class="primaryAction btn btn-primary btn-block" type="submit">{% trans "Sign In" %}</button>
+                <button class="primaryAction btn btn-primary btn-block" type="submit">Sign In</button>
                 <a class="button secondaryAction" href="{% url 'account_reset_password' %}"
-                    style="text-align: center; display: block; font-size: 0.9rem; margin-top: 1rem;">{% trans "Forgot
-                    Password?" %}</a>
+                    style="text-align: center; display: block; font-size: 0.9rem; margin-top: 1rem;">Forgot
+                    Password?</a>
             </div>
         </form>
     </div>
