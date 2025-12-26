@@ -277,13 +277,21 @@ def room_sync(request, room_code):
         if room.timer_status == 'running' and room.timer_start_time:
             current_elapsed += (timezone.now() - room.timer_start_time)
             
+        # Determine who the partner is relative to the current user
+        if request.user == room.creator:
+            partner_name = room.partner.username if room.partner else None
+            partner_joined = room.partner is not None
+        else:
+            partner_name = room.creator.username
+            partner_joined = True # If I'm the partner, the "partner" (creator) is obviously there
+
         data = {
             'status': room.timer_status,
             'phase': room.timer_phase,
             'elapsed_seconds': current_elapsed.total_seconds(),
             'timer_duration': room.timer_duration,
-            'partner_joined': room.partner is not None,
-            'partner_name': room.partner.username if room.partner else None
+            'partner_joined': partner_joined,
+            'partner_name': partner_name
         }
         return JsonResponse(data)
     except StudyRoom.DoesNotExist:
