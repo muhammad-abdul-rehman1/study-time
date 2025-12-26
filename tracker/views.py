@@ -278,11 +278,11 @@ def room_sync(request, room_code):
             current_elapsed += (timezone.now() - room.timer_start_time)
             
         # Determine who the partner is relative to the current user
-        if request.user == room.creator:
+        if request.user == room.created_by:
             partner_name = room.partner.username if room.partner else None
             partner_joined = room.partner is not None
         else:
-            partner_name = room.creator.username
+            partner_name = room.created_by.username
             partner_joined = True # If I'm the partner, the "partner" (creator) is obviously there
 
         data = {
