@@ -123,3 +123,168 @@ def history(request):
         }
         
     return render(request, 'history.html', {'history': formatted_history})
+
+# --- Pomodoro & Study Together Views ---
+
+import json
+from django.http import JsonResponse
+import secrets
+from .models import StudyRoom, PomodoroSession
+
+@login_required
+def study_room(request, room_code):
+    try:
+        room = StudyRoom.objects.get(room_code=room_code, is_active=True)
+        if request.user != room.created_by and request.user != room.partner:
+             return redirect('dashboard')
+        
+        context = {
+            'room': room,
+            'is_creator': request.user == room.created_by,
+        }
+        return render(request, 'study_room.html', context)
+    except StudyRoom.DoesNotExist:
+        return redirect('dashboard')
+
+@login_required
+def create_room(request):
+    if request.method == 'POST':
+        # Deactivate previous active rooms created by user
+        StudyRoom.objects.filter(created_by=request.user, is_active=True).update(is_active=False)
+        
+        # Generate unique code
+        while True:
+            code = secrets.token_hex(3).upper()
+            if not StudyRoom.objects.filter(room_code=code).exists():
+                break
+        
+        room = StudyRoom.objects.create(created_by=request.user, room_code=code)
+        return redirect('study_room', room_code=room.room_code)
+    return redirect('dashboard')
+
+@login_required
+def join_room(request):
+    if request.method == 'POST':
+        code = request.POST.get('room_code')
+        try:
+            room = StudyRoom.objects.get(room_code=code, is_active=True)
+            if room.partner and room.partner != request.user:
+                return redirect('dashboard') # Room full
+            
+            room.partner = request.user
+            room.save()
+            return redirect('study_room', room_code=room.room_code)
+        except StudyRoom.DoesNotExist:
+            pass # Handle invalid code error if needed
+    return redirect('dashboard')
+
+@login_required
+def pomodoro_action(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        action = data.get('action')
+        room_code = data.get('room_code')
+        
+        response_data = {'status': 'success'}
+        
+        # Handle Room Action
+        if room_code:
+            try:
+                room = StudyRoom.objects.get(room_code=room_code, is_active=True)
+                # Verify user permission
+                if request.user not in [room.created_by, room.partner]:
+                    return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+                
+                if action == 'start':
+                    phase = data.get('phase', 'study')
+                    duration = data.get('duration', 25) # Get custom duration
+                    room.timer_status = 'running'
+                    room.timer_phase = phase
+                    room.timer_duration = duration
+                    room.timer_start_time = timezone.now()
+                    room.elapsed_time = timedelta(0)
+                    room.paused_at = None
+                    room.save()
+
+                elif action == 'pause':
+                    if room.timer_status == 'running':
+                        room.timer_status = 'paused'
+                        room.paused_at = timezone.now()
+                        room.elapsed_time += (timezone.now() - room.timer_start_time)
+                        room.save()
+
+                elif action == 'resume':
+                    if room.timer_status == 'paused':
+                        room.timer_status = 'running'
+                        room.timer_start_time = timezone.now()
+                        room.paused_at = None
+                        room.save()
+
+                elif action == 'stop':
+                    room.timer_status = 'stopped'
+                    room.timer_start_time = None
+                    room.elapsed_time = timedelta(0)
+                    room.paused_at = None
+                    room.save()
+                
+                elif action == 'complete':
+                     # Validated by client, but we should double check logic. 
+                     # For now, trust client trigger to save the session.
+                     phase = room.timer_phase
+                     if phase == 'study':
+                         # Create StudySession for BOTH users if applicable
+                         users_to_credit = [room.created_by]
+                         if room.partner:
+                             users_to_credit.append(room.partner)
+                         
+                         duration = timedelta(minutes=room.timer_duration) # Use stored duration
+                         
+                         # For Leaderboard/StudySession model:
+                         for u in users_to_credit:
+                             StudySession.objects.create(
+                                 user=u, 
+                                 start_time=timezone.now() - duration, 
+                                 end_time=timezone.now()
+                             )
+                             
+                         # Create Pomodoro History
+                         for u in users_to_credit:
+                             PomodoroSession.objects.create(
+                                 user=u,
+                                 start_time=timezone.now() - duration,
+                                 end_time=timezone.now(),
+                                 phase='study',
+                                 is_completed=True,
+                                 room=room
+                             )
+                             
+                     room.timer_status = 'stopped'
+                     room.save()
+
+            except StudyRoom.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Room not found'}, status=404)
+        
+        return JsonResponse(response_data)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def room_sync(request, room_code):
+    try:
+        room = StudyRoom.objects.get(room_code=room_code, is_active=True)
+        
+        # Calculate current elapsed time based on state
+        current_elapsed = room.elapsed_time
+        if room.timer_status == 'running' and room.timer_start_time:
+            current_elapsed += (timezone.now() - room.timer_start_time)
+            
+        data = {
+            'status': room.timer_status,
+            'phase': room.timer_phase,
+            'elapsed_seconds': current_elapsed.total_seconds(),
+            'timer_duration': room.timer_duration,
+            'partner_joined': room.partner is not None,
+            'partner_name': room.partner.username if room.partner else None
+        }
+        return JsonResponse(data)
+    except StudyRoom.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Room not found'}, status=404)

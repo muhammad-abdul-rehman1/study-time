@@ -6,6 +6,7 @@
 </div>
 
 <div class="dashboard-grid">
+
     <div class="card stat-card">
         <h3>Today's Study Time</h3>
         <div class="stat-value">{{ total_hours }}h {{ total_minutes }}m</div>
@@ -27,9 +28,31 @@
         </div>
         <form action="{% url 'start_study' %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-secondary btn-block">Start Studying</button>
+            <button type="submit" class="btn btn-secondary btn-block">Start Normal Session</button>
         </form>
         {% endif %}
+    </div>
+
+    <!-- Pomodoro & Study Together -->
+    <div class="card stat-card">
+        <h3>Study Together / Pomodoro</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Use the Pomodoro timer with a friend or solo.</p>
+
+        <form action="{% url 'create_room' %}" method="post" style="margin-bottom: 15px;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-block">Create Private Room</button>
+        </form>
+
+        <hr style="border-color: var(--surface-hover); margin: 15px 0;">
+
+        <form action="{% url 'join_room' %}" method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px;">
+                <input type="text" name="room_code" placeholder="Enter Room Code" required
+                    style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--surface-hover); background: var(--surface-color); color: var(--text-primary);">
+                <button type="submit" class="btn btn-secondary">Join</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">{% trans "Verify Your E-mail Address" %}</h1>
+
+        <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">
+            {% blocktrans %}We have sent an e-mail to you for verification. Follow the link provided to finalize the
+            signup process. Please contact us if you do not receive it within a few minutes.{% endblocktrans %}
+        </p>
+
+    </div>
+</div>
+{% endblock %}
