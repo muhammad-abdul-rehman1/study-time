@@ -31,18 +31,15 @@ https://muhammad0221.pythonanywhere.com
 
 ### Dashboard
 
-<img width="1843" height="1035" alt="image" src="https://github.com/user-attachments/assets/c77b27ba-4446-43d1-bf36-9ea9e890420f" />
-
+<img width="1842" height="1028" alt="image" src="https://github.com/user-attachments/assets/0433acd2-ad2a-4457-82eb-4a71ca272c5c" />
 
 ### Leaderboard
 
-<img width="1842" height="1021" alt="image" src="https://github.com/user-attachments/assets/15322c61-dd12-4d86-abfc-16fc53b17c1d" />
-
+<img width="1837" height="1025" alt="image" src="https://github.com/user-attachments/assets/590702d5-38e2-4146-a3ba-5cebe7928676" />
 
 ### Study Timer
 
-<img width="1847" height="1025" alt="image" src="https://github.com/user-attachments/assets/bce852cd-a596-43c9-a624-e7cf690309b3" />
-
+<img width="1840" height="1015" alt="image" src="https://github.com/user-attachments/assets/ea0dc4e1-1a8a-4237-85b9-8b006f501c40" />
 
 ---
 
